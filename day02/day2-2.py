@@ -31,7 +31,7 @@ inputfile = open(sys.argv[1])
 boxids = [ line.strip() for line in inputfile ]
 
 for start in range(len(boxids)):
-    for compto in range(start, len(boxids)):
+    for compto in range(start + 1, len(boxids)):
         if compare( boxids[start], boxids[compto] ):
             print(commonchars( boxids[start], boxids[compto] ))
             sys.exit()
