@@ -4,7 +4,8 @@ import sys
 import pprint
 import re
 
-# Create 1000x1000 array full of 0s
+# Create 1000x1000 array full of empty sets
+# The sets will contain the claim IDs which cover this square
 
 fabricsize = 1000
 fabric = []
@@ -12,9 +13,10 @@ fabric = []
 for x in range(fabricsize+1):
     fabric.append([])
     for y in range(fabricsize+1):
-        fabric[x].append([])
+        fabric[x].append( set() )
 
 multiclaims = 0
+nooverlaps = set()
 
 # Read the input from the file name specified on the command line
 inputfile = open(sys.argv[1])
@@ -34,16 +36,26 @@ for line in inputfile:
     for x in range(starts[0], starts[0]+size[0]):
         for y in range(starts[1], starts[1]+size[1]):
             if len(fabric[x][y]) == 0:
+                # print("\t", x,y, "not already covered")
                 pass
             elif len(fabric[x][y]) == 1:
+                # print("\t", x,y, "covering for first time")
+                nooverlap = False
                 multiclaims += 1
-            fabric[x][y].append(claim_id)
+            else:
+                # print("\t", x,y, "already covered")
+                nooverlap = False
 
-print(multiclaims, "square inches contested by multiple claims")
+            if len(fabric[x][y]) > 0:
+                # This has been claimed already, so remove the claim IDs
+                # from the set of non-overlapping IDs
+                for existing_id in fabric[x][y]:
+                    nooverlaps.discard(existing_id)
 
-# Now go back over input data and check where there's only one claim_id in all the squares
+            fabric[x][y].add(claim_id)
 
     if nooverlap:
         nooverlaps.add( claim_id )
 
+print(multiclaims, "square inches contested by multiple claims")
 print("No overlaps in claims", nooverlaps)
