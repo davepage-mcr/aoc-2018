@@ -87,7 +87,6 @@ for line in inputfile:      # We pre-sorted the input because this is boring fin
             guard_asleep_this_minute[guard_id][minute] = 0
         guard_asleep_this_minute[guard_id][minute] += 1 
 
-# Create a hypothetical high-id ultra-sleepy guard for testing purposes
 guards_by_sleepiness = sorted(guard_sleep_minutes, key=lambda guard_id: guard_sleep_minutes[guard_id])
 sleepiest_guard = guards_by_sleepiness[-1]
 
