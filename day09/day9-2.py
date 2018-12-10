@@ -5,7 +5,7 @@ import argparse
 import string
 import pprint
 import re
-from array import array
+from blist import blist
 
 pp = pprint.PrettyPrinter()
 
@@ -35,8 +35,7 @@ for line in inputfile:
     num_marbles = int(parse.group(2))
 
     # UnsignedLong should be OK for up to 4294967295 marbles
-    marbles = array('L')
-    marbles.append(0)
+    marbles = blist([ 0 ])
 
     next_marble_id = 1
     current_marble_index = 0
