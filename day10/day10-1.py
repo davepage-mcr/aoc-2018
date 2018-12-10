@@ -102,10 +102,7 @@ clock = 0
 while not expanding:
     expanding = field.tick()
     clock += 1
-    print("After", clock, "second(s):")
     if expanding:
-        print("Field is expanding")
+        print("After", clock, "second(s), grid expanding - narrowest formation at", clock - 1)
         field.tick(True)
         field.print()
-    else:
-        print("Field is contracting")
