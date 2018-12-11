@@ -36,11 +36,9 @@ for x_sub in range(gridsize):
 
         if x_sub > 1 and y_sub > 1:
             # We're at the bottom-right of a pre-calculated 3x3 square, can calculate the power for this square at top left
-            square_power = 0
-            for square_x in range(x_sub-2, x_sub+1):
-                for square_y in range(y_sub-2, y_sub+1):
-                    square_power += cells[square_x][square_y]
-            # print("Total power for square with top-left subscript", [ x_sub-2, y_sub-2 ], square_power)
+            square = cells[x_sub-2:x_sub+1,y_sub-2:y_sub+1]
+            square_power = square.sum()
+
             if max_square_power is None or max_square_power < square_power:
                 max_square_power = square_power
                 max_square_coords = ( x_sub - 1, y_sub - 1 )
