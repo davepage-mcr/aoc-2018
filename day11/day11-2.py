@@ -47,4 +47,5 @@ for x_sub in range(gridsize):
             if max_square_power is None or max_square_power < square_power:
                 max_square_power = square_power
                 max_square_coords = ( x - square_size, y - square_size, square_size+1 )     # Off-by-one on square_size for presentation
-                print("Max square power is", max_square_power, "at", ','.join(str(x) for x in max_square_coords))
+
+print("Max square power is", max_square_power, "at", ','.join(str(x) for x in max_square_coords))
