@@ -31,11 +31,13 @@ for i in range(25000000):
     firstdigit = totalscore // 10
     seconddigit = totalscore % 10
     if ( firstdigit > 0 ):
+        # Look for our scores to find at the end of this array
         scores.append( firstdigit )
         lastfew = ''.join( str(s) for s in scores[-(targetlength):] )
         if lastfew == args.target:
             break
 
+    # Look for our scores to find at the end of this array
     scores.append( seconddigit )
     lastfew = ''.join( str(s) for s in scores[-(targetlength):] )
     if lastfew == args.target:
@@ -46,12 +48,8 @@ for i in range(25000000):
     elfindices[1] += 1 + scores[elfindices[1]]
     elfindices[1] %= len(scores)
 
-    # Look for our scores to find at the end of this array
-    if i % 1000 == 0:
-        print("After", i, "rounds: Last", targetlength, "scores are", lastfew)
-
 else:
     print("Ran out of tries")
     sys.exit(1)
 
-print("Found", args.target, "after", i, "rounds", len(scores) - targetlength, "recipes")
+print("Found", args.target, "after", len(scores) - targetlength, "recipes")
