@@ -3,6 +3,7 @@
 import argparse
 import pprint
 import re
+from colorama import Fore, Style
 
 pp = pprint.PrettyPrinter()
 
@@ -34,22 +35,29 @@ def check_min( current, new ):
     return min(current,new)
 
 def print_scan():
-    print("From", min_x - 1, "to", max_x + 2)
-    for y in range (0, max_y + 2 ):
+    print_some_scan(0, max_y)
+
+def print_some_scan( start_y, end_y ):
+    # print("From", min_x - 1, "to", max_x + 2)
+    for y in range (start_y, end_y + 1):
         print(y, end="\t")
-        for x in range (min_x - 1, max_x + 2 ):
+        for x in range (min_x, max_x + 1):
             coords = (x, y)
             if coords in source:
-                print('+', end="")
+                print(Fore.GREEN + '+', end='')
             elif coords in water_rest:
-                print('~', end="")
+                print(Fore.BLUE + '~', end='')
             elif coords in water_fall:
-                print('|', end="")
+                print(Fore.YELLOW + '|', end="")
             elif coords in clay:
-                print('#', end="")
+                print(Fore.RED + '#', end="")
+            elif coords[0] == 500:
+                print(Fore.GREEN + '.', end="")
+            elif coords[0] % 50 == 0:
+                print(Fore.YELLOW + '.', end="")
             else:
-                print('.', end="")
-        print()
+                print(Style.RESET_ALL + '.', end="")
+        print(Style.RESET_ALL)
 
 def below(coords):
     return tuple([ coords[0], coords[1]+1])
