@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("filename", help="program input")
 args = parser.parse_args()
 
-source = { (500,0) }
+source = set()
 clay = set()
 water_rest = set()
 water_fall = set()
@@ -68,24 +68,41 @@ def left(coords):
 def right(coords):
     return tuple([ coords[0]+1, coords[1]])
 
-def pour(coords):
+def pour(coords, recursion_depth):
+    print("New pour from", coords, "at depth", recursion_depth)
+    if tuple(coords) in source:
+        print("We've already poured from here!")
+        return
+    source.add(tuple(coords))
+    if coords[1] > 1670 and coords[1] < 1750:
+        verbose = True
+        print_some_scan(coords[1]-20, coords[1]+20)
+    else:
+        verbose=False
+
     while coords[1] <= max_y:
         # Have we hit something?
         if below(coords) in clay or below(coords) in water_rest:
-            print("We've hit water or clay below", coords)
-            clean_fill = True
+            if(verbose):
+                print("We've hit water or clay below", coords)
+            # Set defaults for clean_left and clean_right here - if a wall is right against the edge, the for loops below might not run once and these will be descoped
+            clean_left = True
+            clean_right = True
+
             for l in range(coords[0], min_x, -1 ):
                 # Look left until we either hit something or there's nothing below us
                 look_coords = [ l, coords[1] ]
                 below_us = below( look_coords )
                 if not below_us in clay and not below_us in water_rest:
-                    print("There is space below us at", look_coords )
-                    clean_fill = False
+                    if(verbose):
+                        print("\tThere is space below us to the left at", look_coords )
+                    clean_left = False
                     break
 
                 left_us = left( look_coords )
                 if left_us in clay:
-                    print("There is clay left of", look_coords )
+                    if(verbose):
+                        print("\tThere is clay left of us at", look_coords )
                     break
 
             for r in range(coords[0], max_x ):
@@ -93,26 +110,38 @@ def pour(coords):
                 look_coords = [ r, coords[1] ]
                 below_us = below( look_coords )
                 if not below_us in clay and not below_us in water_rest:
-                    print("There is space below us at", look_coords )
-                    clean_fill = False
+                    if(verbose):
+                        print("\tThere is space below us to the right at", look_coords )
+                    clean_right = False
                     break
 
                 right_us = right( look_coords )
                 if right_us in clay:
-                    print("There is clay right of", look_coords )
+                    if(verbose):
+                        print("\tThere is clay right of us at", look_coords )
                     break
 
-            if clean_fill:
+            if clean_left and clean_right:
                 for i in range(l, r+1):
                     fill_coords = tuple([ i, coords[1] ])
                     water_rest.add(fill_coords)
-                print("Clean filled from", [l, coords[1]], "to", [r, coords[1]])
+                if(verbose):
+                    print("\tClean filled from", [l, coords[1]], "to", [r, coords[1]])
                 coords[1] -= 1
-                print("Moving one up and looking at", coords)
+                if(verbose):
+                    print("\tMoving one up and looking at", coords)
                 continue
             else:
-                print("We're overflowing and I don't know how to deal with that")
-                return
+                for i in range(l, r+1):
+                    fill_coords = tuple([ i, coords[1] ])
+                    water_fall.add(fill_coords)
+                if(verbose):
+                    print("\tFall-filled from", [l, coords[1]], "to", [r, coords[1]])
+                if not clean_left:
+                    pour([l, coords[1]], recursion_depth+1)
+                if not clean_right:
+                    pour([r, coords[1]], recursion_depth+1)
+            break
         else:
             water_fall.add( tuple(coords) )
 
@@ -149,7 +178,9 @@ for line in inputfile:
 
 
 # Now we have populated the clay set, we start pouring water from (500,1) downwards
-pour( [500,1] )
-print_scan()
+pour( [500,1], 0 )
 
 # Sanity check: Make sure no intersection between waters and clay
+all_water = water_rest.union(water_fall)
+
+print(len(all_water), "water squares")
