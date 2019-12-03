@@ -94,8 +94,22 @@ for line in inputfile:
 coords = [500,1]
 while coords[1] <= max_y:
     # Have we hit something?
-    if below(coords) in clay:
-        print("We've hit clay at", coords)
+    if below(coords) in clay or below(coords) in water_rest:
+        print("We've hit water or clay below", coords)
+        for x in range(coords[0], min_x, -1 ):
+            # Look left until we either hit something or there's nothing below us
+            look_coords = [ x, coords[1] ]
+            below_us = below( look_coords )
+            if not below_us in clay and not below_us in water_rest:
+                print("There is space below us at", look_coords )
+                break
+
+            water_rest.add(tuple(look_coords))
+            left_us = left( look_coords )
+            if left_us in clay:
+                print("There is clay left of", look_coords )
+                break
+
         break
 
     water_fall.add( tuple(coords) )
