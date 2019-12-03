@@ -34,19 +34,19 @@ def check_min( current, new ):
     return min(current,new)
 
 def print_scan():
-    print(min_x, max_x)
+    print("From", min_x - 1, "to", max_x + 2)
     for y in range (0, max_y + 2 ):
         print(y, end="\t")
         for x in range (min_x - 1, max_x + 2 ):
             coords = (x, y)
             if coords in source:
                 print('+', end="")
-            elif coords in clay:
-                print('#', end="")
             elif coords in water_rest:
                 print('~', end="")
             elif coords in water_fall:
                 print('|', end="")
+            elif coords in clay:
+                print('#', end="")
             else:
                 print('.', end="")
         print()
@@ -59,6 +59,56 @@ def left(coords):
 
 def right(coords):
     return tuple([ coords[0]+1, coords[1]])
+
+def pour(coords):
+    while coords[1] <= max_y:
+        # Have we hit something?
+        if below(coords) in clay or below(coords) in water_rest:
+            print("We've hit water or clay below", coords)
+            clean_fill = True
+            for l in range(coords[0], min_x, -1 ):
+                # Look left until we either hit something or there's nothing below us
+                look_coords = [ l, coords[1] ]
+                below_us = below( look_coords )
+                if not below_us in clay and not below_us in water_rest:
+                    print("There is space below us at", look_coords )
+                    clean_fill = False
+                    break
+
+                left_us = left( look_coords )
+                if left_us in clay:
+                    print("There is clay left of", look_coords )
+                    break
+
+            for r in range(coords[0], max_x ):
+                # Look right until we either hit something or there's nothing below us
+                look_coords = [ r, coords[1] ]
+                below_us = below( look_coords )
+                if not below_us in clay and not below_us in water_rest:
+                    print("There is space below us at", look_coords )
+                    clean_fill = False
+                    break
+
+                right_us = right( look_coords )
+                if right_us in clay:
+                    print("There is clay right of", look_coords )
+                    break
+
+            if clean_fill:
+                for i in range(l, r+1):
+                    fill_coords = tuple([ i, coords[1] ])
+                    water_rest.add(fill_coords)
+                print("Clean filled from", [l, coords[1]], "to", [r, coords[1]])
+                coords[1] -= 1
+                print("Moving one up and looking at", coords)
+                continue
+            else:
+                print("We're overflowing and I don't know how to deal with that")
+                return
+        else:
+            water_fall.add( tuple(coords) )
+
+        coords[1] += 1
 
 for line in inputfile:
     # Populate the "clay" set with tuples from the coordinate sets in this line
@@ -89,30 +139,9 @@ for line in inputfile:
 
         clay.add(coords)
 
+
 # Now we have populated the clay set, we start pouring water from (500,1) downwards
-
-coords = [500,1]
-while coords[1] <= max_y:
-    # Have we hit something?
-    if below(coords) in clay or below(coords) in water_rest:
-        print("We've hit water or clay below", coords)
-        for x in range(coords[0], min_x, -1 ):
-            # Look left until we either hit something or there's nothing below us
-            look_coords = [ x, coords[1] ]
-            below_us = below( look_coords )
-            if not below_us in clay and not below_us in water_rest:
-                print("There is space below us at", look_coords )
-                break
-
-            water_rest.add(tuple(look_coords))
-            left_us = left( look_coords )
-            if left_us in clay:
-                print("There is clay left of", look_coords )
-                break
-
-        break
-
-    water_fall.add( tuple(coords) )
-    coords[1] += 1
-
+pour( [500,1] )
 print_scan()
+
+# Sanity check: Make sure no intersection between waters and clay
